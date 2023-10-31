@@ -19,7 +19,8 @@ class AppointmentController extends Controller
         $data = collect();
         foreach($appointments as $item){
             $data->push([
-                'name' => $item->detail,
+                'id' => $item->id,
+                'name' =>  $item->user->first_name . ' ' . $item->user->last_name,
                 'start' => Carbon::parse($item->date . ' ' . $item->schedule->start_time)->format('Y-m-d h:i'),
                 'end' => Carbon::parse($item->date . ' ' . $item->schedule->end_time)->format('Y-m-d h:i')
             ]);

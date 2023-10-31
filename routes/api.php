@@ -20,5 +20,6 @@ Route::namespace('v1')->prefix('v1')->group(function () {
         Route::get('schedules', 'ScheduleController@all');
     });
 
+    Route::get('calendar', 'ScheduleController@calendar');
     Route::post('appointments', 'AppointmentController@store');
 });

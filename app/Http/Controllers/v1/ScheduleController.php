@@ -13,6 +13,7 @@ use App\Models\Appointment;
 use App\Models\Schedule;
 use Carbon\Carbon;
 use Validator;
+use DB;
 
 class ScheduleController extends Controller
 {
@@ -22,6 +23,19 @@ class ScheduleController extends Controller
         $data = Schedule::orderBy('id', $sortDesc)
         ->search($search)
         ->paginate($request->itemsPerPage);
+        return response()->json($data, 200);
+    }
+
+    public function calendar(Request $request){
+        $dates = Appointment::select(DB::raw("date"))->groupBy('date')->get();
+        $data = collect();
+        foreach($dates as $date){
+            $schedules = Appointment::where('date', $date->date)->get()->pluck('schedule_id')->toArray();
+            $count = Schedule::whereNotIn('id', $schedules)->count();
+            if($count == 0){
+                $data->push($date->date);
+            }
+        }
         return response()->json($data, 200);
     }
 
