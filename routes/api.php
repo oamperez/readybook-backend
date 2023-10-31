@@ -9,6 +9,7 @@ Route::namespace('v1')->prefix('v1')->group(function () {
         Route::get('logout', 'AuthController@logout');
         Route::get('me', 'AuthController@me');
         //Admin
+        Route::ApiResource('users', 'UserController');
         Route::ApiResource('categories', 'CategoryController');
         Route::ApiResource('schedules', 'ScheduleController');
         Route::get('appointments', 'AppointmentController@index');

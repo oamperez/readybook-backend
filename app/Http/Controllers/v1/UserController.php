@@ -20,6 +20,7 @@ class UserController extends Controller
         $sortDesc = $request->input('sortDesc');
         $data = User::orderBy('id', $sortDesc)
         ->search($search)
+        ->where('role', $request->input('role', 0))
         ->paginate($request->itemsPerPage);
         return response()->json($data, 200);
     }
@@ -31,12 +32,17 @@ class UserController extends Controller
 
     public function store(Request $request){
        $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|unique:users',
+            'password' => 'required',
+            'phone' => 'required',
         ]);
         if($validator->fails()){
             return response()->json(['message' => $validator->errors()->first()], 422);
         }
         $data = User::create($request->all());
+        $data->password = bcrypt($request->password);
         $data->save();
         return response()->json([
             'message' => 'Registro creado con éxito.',
@@ -57,13 +63,22 @@ class UserController extends Controller
         if(is_null($data)){
             return response()->json(['message' => 'No se encontró el registro.'], 404);
         }
-       $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|unique:users,email,' . $data->id,
+            'phone' => 'required',
+        ]);
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
         ]);
         if($validator->fails()){
             return response()->json(['message' => $validator->errors()->first()], 422);
         }
         $data->update($request->all());
+        if($request->password){
+            $data->password = bcrypt($request->password);
+        }
         $data->save();
         return response()->json([
             'message' => 'Registro actualizado con éxito.',

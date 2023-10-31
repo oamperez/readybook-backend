@@ -21,6 +21,7 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
+        'role', // 1 - admin | 0 - client
     ];
 
     protected $hidden = [
@@ -34,4 +35,9 @@ class User extends Authenticatable
     ];
     
     protected $dates = ['deleted_at'];
+    
+    //SCOPES
+    public function scopeSearch($query, $search){ 
+        return $query->where('first_name', 'LIKE', "%{$search}%")->where('last_name', 'LIKE', "%{$search}%");
+    }
 }
