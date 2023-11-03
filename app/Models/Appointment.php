@@ -30,4 +30,6 @@ class Appointment extends Model
     public function category(){ return $this->belongsTo('App\Models\Category'); }
 
     public function schedule(){ return $this->belongsTo('App\Models\Schedule'); }
+
+    public function participants(){ return $this->hasMany('App\Models\Participant'); }
 }

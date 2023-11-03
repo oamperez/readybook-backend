@@ -4,10 +4,14 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CountParticipantImport;
+use Illuminate\Support\Facades\Storage;
+use App\Imports\ParticipantImport;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Appointment;
+use App\Jobs\ImportJob;
 use App\Models\User;
 use Carbon\Carbon;
 use Validator;
@@ -20,7 +24,8 @@ class AppointmentController extends Controller
         foreach($appointments as $item){
             $data->push([
                 'id' => $item->id,
-                'name' =>  $item->user->first_name . ' ' . $item->user->last_name,
+                'state' =>  $item->state,
+                'name' =>  '#'. $item->id . ' / ' .$item->user->first_name . ' ' . $item->user->last_name,
                 'start' => Carbon::parse($item->date . ' ' . $item->schedule->start_time)->format('Y-m-d h:i'),
                 'end' => Carbon::parse($item->date . ' ' . $item->schedule->end_time)->format('Y-m-d h:i')
             ]);
@@ -56,6 +61,12 @@ class AppointmentController extends Controller
             $data = Appointment::create($request->all());
             $data->user_id = $user->id;
             $data->save();
+            if($request->file('file')){
+                $file = $request->file('file');
+                $name = time().Str::random(5).'.'.$file->getClientOriginalExtension();
+                $path = Storage::putFileAs('/', $request->file('file'), $name);
+                ImportJob::dispatch($path, $data->id);
+            }
             return response()->json([
                 'message' => 'Cita generada con éxito.',
                 'data' => $data
@@ -65,7 +76,7 @@ class AppointmentController extends Controller
     }
 
     public function show(Request $request, $id){
-        $data = Appointment::find($id);
+        $data = Appointment::with('user', 'category', 'schedule', 'participants')->find($id);
         if(is_null($data)){
             return response()->json(['message' => 'No se encontró el registro.'], 404);
         }
@@ -78,18 +89,16 @@ class AppointmentController extends Controller
             return response()->json(['message' => 'No se encontró el registro.'], 404);
         }
         $validator = Validator::make($request->all(), [
-            'category_id' =>'required|exists:categories,id',
-            'date' => 'required',
-            'schedule_id' => 'required|exists:schedules,id',
-            'file' => 'required|max:5120',
+            'state' => 'required',
+            'reason' => 'required_if:state,==,2',
         ]);
         if($validator->fails()){
-            return response()->json($validator->errors(), 422);
+            return response()->json(['message' => $validator->errors()->first()], 422);
         }
         $data->update($request->all());
         $data->save();
         return response()->json([
-            'message' => 'Registro actualizado con éxito.',
+            'message' => 'Evento ' . ($request->state == 1 ? 'Aprobado' : 'Rechazado') . ' con éxito.',
             'data' => $data
         ], 200);
     }
@@ -99,21 +108,15 @@ class AppointmentController extends Controller
         if(is_null($data)){
             return response()->json(['message' => 'No se encontró el registro.'], 404);
         }
-        $validator = Validator::make($request->all(), [
-            'password' => ['required', function ($attr, $password, $validation) use($request) {
-                if($password){
-                    if (!\Hash::check($password, $request->user()->password)) {
-                        return $validation(__('The current password is incorrect.'));
-                    }
-                }
-            }],
-        ]);
-        if($validator->fails()){
-            return response()->json($validator->errors(), 422);
-        }
         $data->delete();
         return response()->json([
             'message' => 'Registro eliminado con éxito.'
         ], 200);
+    }
+
+    public function participants(Request $request){
+        $import = new CountParticipantImport;
+        Excel::import($import, request()->file('file'));
+        return response()->json($import->getRowCount(), 200);
     }
 }
