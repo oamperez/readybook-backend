@@ -1,0 +1,1 @@
+<p>Hola {{ $data['name'] }}, tu cita ha sido rechazada con razón: {{ $data['reason'] }}</p>

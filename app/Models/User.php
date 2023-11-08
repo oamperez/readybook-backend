@@ -40,4 +40,11 @@ class User extends Authenticatable
     public function scopeSearch($query, $search){ 
         return $query->where('first_name', 'LIKE', "%{$search}%")->where('last_name', 'LIKE', "%{$search}%");
     }
+
+    public function getNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
+    protected $appends = ['name'];
 }

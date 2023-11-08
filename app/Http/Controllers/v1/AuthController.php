@@ -21,9 +21,9 @@ class AuthController extends Controller
         }
         $authorized = User::where('email', $request->email)->first();
         if($authorized){
-            if(is_null($authorized->email_verified_at)){
-                return response()->json(['message' => 'Tu correo electrónico aun no ha sido verificado.'], 404);
-            }
+            // if(is_null($authorized->email_verified_at)){
+            //     return response()->json(['message' => 'Tu correo electrónico aun no ha sido verificado.'], 404);
+            // }
             $password = \Hash::check($request->password, $authorized->password);
             if($password){
                 $remember = $request->remember ? true : false;

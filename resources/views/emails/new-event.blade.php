@@ -1,0 +1,1 @@
+<p>Hola {{ $data['name'] }}, tu cita ha sido creada con éxito, estaremos notificando el proceso.</p>

@@ -13,6 +13,16 @@ Route::namespace('v1')->prefix('v1')->group(function () {
         Route::ApiResource('categories', 'CategoryController');
         Route::ApiResource('schedules', 'ScheduleController');
         Route::get('appointments', 'AppointmentController@index');
+        Route::get('my/appointments', 'AppointmentController@my');
+        Route::get('appointments/{id}', 'AppointmentController@show');
+        Route::put('appointments/{id}', 'AppointmentController@update');
+        Route::delete('participants/{id}', 'AppointmentController@participants_destroy');
+        Route::post('append/participants/{id}', 'AppointmentController@participants_append');
+        
+        Route::get('app/settings', 'SettingController@app');
+        Route::post('app/settings', 'SettingController@appupdate');
+        Route::get('mail/settings', 'SettingController@mail');
+        Route::post('mail/settings', 'SettingController@mailupdate');
     });
 
     Route::prefix('all')->group(function () {
@@ -20,9 +30,8 @@ Route::namespace('v1')->prefix('v1')->group(function () {
         Route::get('schedules', 'ScheduleController@all');
     });
 
+    Route::get('setapp', 'SettingController@setapp');
     Route::get('calendar', 'ScheduleController@calendar');
     Route::post('appointments', 'AppointmentController@store');
     Route::post('validate/participants', 'AppointmentController@participants');
-    Route::get('appointments/{id}', 'AppointmentController@show');
-    Route::put('appointments/{id}', 'AppointmentController@update');
 });

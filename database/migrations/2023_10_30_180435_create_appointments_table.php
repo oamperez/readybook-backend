@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('schedule_id')->nullable();
             $table->integer('notify')->default(0);
             $table->longText('detail')->nullable();
-            $table->integer('state')->nullable(); // 0 - PENDIENTE | 1 - APROBADA | 2 - RECHAZADA
+            $table->integer('state')->default(0); // 0 - PENDIENTE | 1 - APROBADA | 2 - RECHAZADA
             $table->longText('reazon')->nullable();
             $table->softDeletes();
             $table->timestamps();
