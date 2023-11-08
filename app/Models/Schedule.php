@@ -21,6 +21,6 @@ class Schedule extends Model
 
     //SCOPES
     public function scopeSearch($query, $search){ 
-        return $query->where('start_time', 'LIKE', "%{$search}%")->where('end_time', 'LIKE', "%{$search}%");
+        return $query->where('start_time', 'LIKE', "%{$search}%")->orwhere('end_time', 'LIKE', "%{$search}%");
     }
 }

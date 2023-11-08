@@ -38,7 +38,7 @@ class User extends Authenticatable
     
     //SCOPES
     public function scopeSearch($query, $search){ 
-        return $query->where('first_name', 'LIKE', "%{$search}%")->where('last_name', 'LIKE', "%{$search}%");
+        return $query->where('first_name', 'LIKE', "%{$search}%")->orwhere('last_name', 'LIKE', "%{$search}%")->orwhere('email', 'LIKE', "%{$search}%");
     }
 
     public function getNameAttribute()
