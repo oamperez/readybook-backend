@@ -11,7 +11,11 @@ Route::namespace('v1')->prefix('v1')->group(function () {
         //Admin
         Route::ApiResource('users', 'UserController');
         Route::ApiResource('categories', 'CategoryController');
+        Route::get('categories/{id}/users', 'CategoryController@get_users');
+        Route::post('categories/{id}/users', 'CategoryController@add_users');
         Route::ApiResource('schedules', 'ScheduleController');
+        Route::ApiResource('disable/dates', 'DisableDateController');
+        
         Route::get('appointments', 'AppointmentController@index');
         Route::get('my/appointments', 'AppointmentController@my');
         Route::get('appointments/{id}', 'AppointmentController@show');
@@ -28,6 +32,7 @@ Route::namespace('v1')->prefix('v1')->group(function () {
     Route::prefix('all')->group(function () {
         Route::get('categories', 'CategoryController@all');
         Route::get('schedules', 'ScheduleController@all');
+        Route::get('disable/dates', 'DisableDateController@all');
     });
 
     Route::get('setapp', 'SettingController@setapp');

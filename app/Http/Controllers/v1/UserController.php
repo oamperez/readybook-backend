@@ -31,17 +31,23 @@ class UserController extends Controller
     }
 
     public function store(Request $request){
-       $validator = Validator::make($request->all(), [
+        $data = User::where('deleted_at', '!=', NULL)->where('email', $request->email)->withTrashed()->first();
+        $validator = Validator::make($request->all(), [
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|unique:users',
+            'email' => $data ? 'required|unique:users,email,'. $data->id : 'required|unique:users,email',
             'password' => 'required',
             'phone' => 'required',
         ]);
         if($validator->fails()){
             return response()->json(['message' => $validator->errors()->first()], 422);
         }
-        $data = User::create($request->all());
+        if($data){
+            $data->restore();
+            $data->update($request->all());
+        }else{
+            $data = User::create($request->all());
+        }
         $data->password = bcrypt($request->password);
         $data->save();
         return response()->json([

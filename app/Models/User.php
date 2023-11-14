@@ -41,6 +41,11 @@ class User extends Authenticatable
         return $query->where('first_name', 'LIKE', "%{$search}%")->orwhere('last_name', 'LIKE', "%{$search}%")->orwhere('email', 'LIKE', "%{$search}%");
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany('App\Models\Category');
+    }
+
     public function getNameAttribute()
     {
         return $this->first_name . ' ' . $this->last_name;

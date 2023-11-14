@@ -92,6 +92,11 @@ class AppointmentController extends Controller
                 $path = Storage::putFileAs('/', $request->file('file'), $name);
                 ImportJob::dispatch($path, $data->id);
             }
+            foreach(json_decode($request->appends, true) as $item){
+                $participant = Participant::create($item);
+                $participant->appointment_id = $data->id;
+                $participant->save();
+            }
             try{
                 $mail = MailSetting::latest()->first();
                 if($mail){

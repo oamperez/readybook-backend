@@ -16,6 +16,9 @@ class Participant extends Model
         'cui',
         'name',
         'appointment_id',
+        'age',
+        'gender',
+        'country',
     ];
 
     protected $dates = ['deleted_at'];

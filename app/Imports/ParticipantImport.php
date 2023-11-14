@@ -29,7 +29,10 @@ class ParticipantImport implements ToModel, WithHeadingRow
         $request = [
             'cui' => $row['dpi'],
             'name' => $row['nombre_completo'],
-            'appointment_id' => $this->appointment_id
+            'appointment_id' => $this->appointment_id,
+            'age' => $row['edad'],
+            'gender' => $row['genero'],
+            'country' => $row['pais_de_origen'],
         ];
         $data = Participant::create($request);
         $data->save();

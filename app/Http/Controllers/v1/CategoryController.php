@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Category;
+use App\Models\User;
 use Carbon\Carbon;
 use Validator;
 
@@ -27,6 +28,30 @@ class CategoryController extends Controller
     public function all(Request $request){
         $data = Category::all();
         return response()->json($data, 200);
+    }
+
+    public function get_users(Request $request, $id){
+        $category = Category::find($id);
+        if(is_null($category)){
+            return response()->json(['message' => 'No se encontró el registro.'], 404);
+        }
+        $users = User::all();
+        $data = [
+            'users' => $users,
+            'category_users' => $category->users->pluck('id')
+        ];
+        return response()->json($data, 200);
+    }
+
+    public function add_users(Request $request, $id){
+        $category = Category::find($id);
+        if(is_null($category)){
+            return response()->json(['message' => 'No se encontró el registro.'], 404);
+        }
+        $category->users()->sync($request->users);
+        return response()->json([
+            'message' => 'Usuarios agregados con éxito.',
+        ], 201);
     }
 
     public function store(Request $request){
