@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use App\Models\MailSetting;
 use App\Models\Appointment;
 use App\Models\Participant;
+use App\Models\Category;
 use App\Jobs\ImportJob;
 use App\Models\User;
 use Carbon\Carbon;
@@ -33,7 +34,7 @@ class AppointmentController extends Controller
             $data->push([
                 'id' => $item->id,
                 'state' =>  $item->state,
-                'name' =>  '#'. $item->id . ' / ' .$item->user->first_name . ' ' . $item->user->last_name,
+                'name' =>  '#'. $item->id . ' / ' . ($item->user->name ?? ''),
                 'start' => Carbon::parse($item->date . ' ' . $item->schedule->start_time)->format('Y-m-d h:i'),
                 'end' => Carbon::parse($item->date . ' ' . $item->schedule->end_time)->format('Y-m-d h:i')
             ]);
@@ -113,6 +114,14 @@ class AppointmentController extends Controller
                         'name' => $mail->MAIL_FROM_NAME,
                     ]]);
                     \Mail::to($request->email)->send(new AppointmentMail(['state' => 0, 'name' => $data->user->name ?? ''], 'Cita'));
+                    $category = Category::find($request->category_id);
+                    foreach($category->users as $user){
+                        if($user->email != $request->email){
+                            \Mail::to($user->email)->send(new AppointmentMail(['state' => 0, 'name' => $user->name ?? '', 'email' => $request->email, 'date' => $request->date,
+                            'hour' => ($data->schedule->start_time ?? '') . ' - ' . ($data->schedule->end_time ?? ''),
+                            'category' => $category->name, 'other' => true], 'Cita Agendada'));
+                        }
+                    }
                 }
             } catch (\Throwable $th) {
                 return response()->json([
