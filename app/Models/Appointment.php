@@ -25,11 +25,11 @@ class Appointment extends Model
 
     protected $dates = ['deleted_at'];
 
-    public function user(){ return $this->belongsTo('App\Models\User'); }
+    public function user(){ return $this->belongsTo('App\Models\User')->withTrashed(); }
 
-    public function category(){ return $this->belongsTo('App\Models\Category'); }
+    public function category(){ return $this->belongsTo('App\Models\Category')->withTrashed(); }
 
-    public function schedule(){ return $this->belongsTo('App\Models\Schedule'); }
+    public function schedule(){ return $this->belongsTo('App\Models\Schedule')->withTrashed(); }
 
-    public function participants(){ return $this->hasMany('App\Models\Participant'); }
+    public function participants(){ return $this->hasMany('App\Models\Participant')->withTrashed(); }
 }
