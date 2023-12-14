@@ -11,8 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\MailSetting;
 use App\Models\AppSetting;
+use App\Mail\TestEmail;
 use Carbon\Carbon;
 use Validator;
+use Mail;
 use DB;
 
 class SettingController extends Controller
@@ -66,6 +68,34 @@ class SettingController extends Controller
             $data = MailSetting::create($request->all());
         }
         return response()->json($data, 200);
+    }
+
+    public function mail_test(Request $request){
+        $data = MailSetting::latest()->first();
+        if(is_null($data)){
+            return response()->json(['message' => 'Aun no se ha agregado la configuración'], 400);
+        }
+        config(['mail.mailers.smtp' => [
+            'transport' => $data->MAIL_MAILER,
+            'host' => $data->MAIL_HOST,
+            'port' => $data->MAIL_PORT,
+            'encryption' => $data->MAIL_ENCRYPTION,
+            'username' => $data->MAIL_USERNAME,
+            'password' => $data->MAIL_PASSWORD,
+        ]]);
+        config(['mail.from' => [
+            'address' => $data->MAIL_FROM_ADDRESS,
+            'name' => $data->MAIL_FROM_NAME,
+        ]]);
+        if(is_null($request->test_email)){
+            return response()->json(['message' => 'El correo electronico es requerido'], 412);
+        }
+        try {
+            Mail::to($request->test_email)->send(new TestEmail);
+            return response()->json(['message' => 'Correo enviado con éxito'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Verifica que todos los datos esten correctos '. $th->getMessage()], 400);
+        }
     }
 
     public function mailupdate(Request $request){

@@ -174,7 +174,7 @@ class AppointmentController extends Controller
                     'address' => $mail->MAIL_FROM_ADDRESS,
                     'name' => $mail->MAIL_FROM_NAME,
                 ]]);
-                \Mail::to($data->user->email ?? 'oamperezp@gmail.com')->send(new AppointmentMail(['state' => $data->state, 'reason' => $data->reason, 'name' => $data->user->name ?? ''], 'Cita '. ($data->state == 1 ? 'Aprobada' : 'Rechazada') ));
+                \Mail::to($data->user->email ?? 'oamperezp@gmail.com')->send(new AppointmentMail(['state' => $data->state, 'reason' => $request->reason, 'name' => $data->user->name ?? ''], 'Cita '. ($data->state == 1 ? 'Aprobada' : 'Rechazada') ));
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -223,14 +223,15 @@ class AppointmentController extends Controller
         }
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'cui' => 'required',
         ]);
         if($validator->fails()){
             return response()->json(['message' => $validator->errors()->first()], 422);
         }
-        $participant = Participant::where(['cui' => $request->cui, 'appointment_id' => $appointment->id])->first();
-        if($participant){
-            return response()->json(['message' => 'El participante ingresado ya ha sido registrado.'], 422);
+        if($request->cui){
+            $participant = Participant::where(['cui' => $request->cui, 'appointment_id' => $appointment->id])->first();
+            if($participant){
+                return response()->json(['message' => 'El participante ingresado ya ha sido registrado.'], 422);
+            }
         }
         $data = Participant::create($request->all());
         $data->appointment_id = $appointment->id;

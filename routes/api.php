@@ -27,6 +27,7 @@ Route::namespace('v1')->prefix('v1')->group(function () {
         Route::post('app/settings', 'SettingController@appupdate');
         Route::get('mail/settings', 'SettingController@mail');
         Route::post('mail/settings', 'SettingController@mailupdate');
+        Route::post('test/mail/settings', 'SettingController@mail_test');
     });
 
     Route::prefix('all')->group(function () {
@@ -35,6 +36,7 @@ Route::namespace('v1')->prefix('v1')->group(function () {
         Route::get('disable/dates', 'DisableDateController@all');
     });
 
+    Route::get('countries', 'ScheduleController@countries');
     Route::get('setapp', 'SettingController@setapp');
     Route::get('calendar', 'ScheduleController@calendar');
     Route::post('appointments', 'AppointmentController@store');

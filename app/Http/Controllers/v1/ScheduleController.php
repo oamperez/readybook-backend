@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\DisableDate;
 use App\Models\Appointment;
 use App\Models\Schedule;
+use App\Models\Country;
 use Carbon\Carbon;
 use Validator;
 use DB;
@@ -106,5 +107,10 @@ class ScheduleController extends Controller
         return response()->json([
             'message' => 'Registro eliminado con éxito.'
         ], 200);
+    }
+    
+    public function countries(Request $request){
+        $countries = Country::all();
+        return response()->json($countries, 200);
     }
 }
