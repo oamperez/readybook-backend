@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Appointment;
 use App\Models\DisableDate;
+use App\Models\AppSetting;
 use Carbon\Carbon;
 use Validator;
 use DB;
@@ -29,6 +30,28 @@ class DisableDateController extends Controller
     public function disabledates(Request $request){
         $data = DisableDate::select(DB::raw("date"))->pluck('date')->get();
         return response()->json($data, 200);
+    }
+
+    public function disabledallow(Request $request){
+        $data = AppSetting::latest()->first();
+        if(is_null($data)){
+            $data = AppSetting::create($request->all());
+        }
+        return response()->json($data->non_days ?? [], 200);
+    }
+
+    public function disabledallowupdate(Request $request){
+        $data = AppSetting::latest()->first();
+        if(is_null($data)){
+            $data = AppSetting::create($request->all());
+        }else{
+            $data->update($request->all());
+        }
+        $data->save();
+        return response()->json([
+            'message' => 'Configuración de de fechas inactivas agregada con éxito.',
+            'data' => $data
+        ], 200);
     }
 
     public function all(Request $request){

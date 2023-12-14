@@ -15,9 +15,14 @@ class AppSetting extends Model
     protected $fillable = [
         'app_name',
         'icon',
+        'non_days',
     ];
 
     public function getIconAttribute(){
         return $this->attributes['icon'] ? Storage::url($this->attributes['icon']) : ''; 
+    }
+
+    public function getNonDaysAttribute(){
+        return json_decode($this->attributes['non_days']); 
     }
 }

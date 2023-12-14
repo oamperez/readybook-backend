@@ -28,12 +28,16 @@ Route::namespace('v1')->prefix('v1')->group(function () {
         Route::get('mail/settings', 'SettingController@mail');
         Route::post('mail/settings', 'SettingController@mailupdate');
         Route::post('test/mail/settings', 'SettingController@mail_test');
+
+        Route::post('disable/allowed-dates', 'DisableDateController@disabledallowupdate');
+        Route::get('disable/allowed-dates', 'DisableDateController@disabledallow');
     });
 
     Route::prefix('all')->group(function () {
         Route::get('categories', 'CategoryController@all');
         Route::get('schedules', 'ScheduleController@all');
         Route::get('disable/dates', 'DisableDateController@all');
+        Route::get('disable/allowed-dates', 'DisableDateController@disabledallow');
     });
 
     Route::get('countries', 'ScheduleController@countries');
