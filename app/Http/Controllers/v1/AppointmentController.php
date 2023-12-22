@@ -113,8 +113,12 @@ class AppointmentController extends Controller
                         'address' => $mail->MAIL_FROM_ADDRESS,
                         'name' => $mail->MAIL_FROM_NAME,
                     ]]);
-                    \Mail::to($request->email)->send(new AppointmentMail(['state' => 0, 'name' => $data->user->name ?? ''], 'Cita'));
                     $category = Category::find($request->category_id);
+                    \Mail::to($request->email)->send(new AppointmentMail([
+                        'state' => 0, 'name' => $data->user->name ?? '', 'date' => $request->date,
+                        'hour' => ($data->schedule->start_time ?? '') . ' - ' . ($data->schedule->end_time ?? ''),
+                        'category' => $category->name
+                    ], 'Cita'));
                     foreach($category->users as $user){
                         if($user->email != $request->email){
                             \Mail::to($user->email)->send(new AppointmentMail(['state' => 0, 'name' => $user->name ?? '', 'email' => $request->email, 'date' => $request->date,
