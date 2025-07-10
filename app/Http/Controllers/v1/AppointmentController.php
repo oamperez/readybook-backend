@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\CountParticipantImport;
 use Illuminate\Support\Facades\Storage;
 use App\Imports\ParticipantImport;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rule;
 use App\Mail\AppointmentMail;
 use Illuminate\Http\Request;
@@ -244,5 +245,19 @@ class AppointmentController extends Controller
             'message' => 'Participante eliminado con éxito.',
             'data' => $data
         ], 200);
+    }
+
+    public function rating(Request $request){
+        $request->merge(['comment' => $request->comment ?? "-"]);
+        
+        $endpoint = env('BPM_URL', 'https://bpm.movil-max.com/api');
+
+        $response = Http::acceptJson()
+            ->retry(3, 100)
+            ->withoutVerifying()
+            ->post($endpoint . '/ratings/generate', $request->all())
+            ->object();
+
+        return $response;
     }
 }
